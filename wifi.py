@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import click
 import dbus
 import uuid
@@ -12,25 +13,34 @@ def cli():
 
 
 @cli.command("backup")
-def backup():
-    filename = "wifi-connections.json"
+@click.argument('filename', required=False)
+def backup(filename):
+    if not filename:
+        filename = "wifi-connections.json"
 
     cons = list_connections()
     write_to_file(cons, filename)
 
-    print(f"Wifi connection backuped to: {filename}")
+    print(f"[INFO] Wifi connections backuped to: {filename}")
 
 
 @cli.command("import")
-def _import():
-    filename = "wifi-connections.json"
+@click.argument('filename', required=False)
+def _import(filename):
+    if not filename:
+        filename = "wifi-connections.json"
+
+    print(f"[INFO] Wifi connections importing from: {filename}")
+    if not os.path.isfile(filename):
+        print(f"[ERROR] {filename} does not exist")
+        return
 
     with open(filename, "r") as f:
         for json_con in f:
             jcon = json.loads(json_con)
 
             con = create_wifi_connection_dict(jcon)
-            add_connection(connection)
+            add_connection(con)
 
 
 def add_connection(connection):
