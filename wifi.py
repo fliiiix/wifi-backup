@@ -12,7 +12,7 @@ def cli():
     pass
 
 
-@cli.command("backup")
+@cli.command("backup", help="Backup all wifi connections from NetworkManager.")
 @click.argument('filename', required=False)
 def backup(filename):
     if not filename:
@@ -24,7 +24,7 @@ def backup(filename):
     print(f"[INFO] Wifi connections backuped to: {filename}")
 
 
-@cli.command("import")
+@cli.command("import", help="Import wifi connections form a file to the NetworkManager.")
 @click.argument('filename', required=False)
 def _import(filename):
     if not filename:
@@ -66,8 +66,7 @@ def create_wifi_connection_dict(connection):
         'mode': 'infrastructure',
     })
 
-
-    wsecurity = dbus.Dictionary({ 'key-mgmt': 'None' })
+    wsecurity = dbus.Dictionary({'key-mgmt': 'None'})
     if secret_type == "wpa-psk":
         psk = connection['secrets']['psk']
 
@@ -94,7 +93,6 @@ def create_wifi_connection_dict(connection):
         if secrets['anonymous-identity']:
             wsecurity_enterprise['anonymous-identity'] = secrets['anonymous-identity']
 
-
     ip_settings = dbus.Dictionary({'method': 'auto'})
     con = dbus.Dictionary({
         'connection': connection_type,
@@ -112,8 +110,9 @@ def create_wifi_connection_dict(connection):
 
 def merge_secrets(proxy, config, setting_name):
     try:
-        # returns a dict of dicts mapping name::setting, where setting is a dict
-        # mapping key::value.  Each member of the 'setting' dict is a secret
+        # returns a dict of dicts mapping name::setting,
+        # where setting is a dict mapping key::value.
+        # Each member of the 'setting' dict is a secret
         secrets = proxy.GetSecrets(setting_name)
 
         # Copy the secrets into our connection config
