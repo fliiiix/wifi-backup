@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import click
 import dbus
 import uuid
@@ -11,26 +12,35 @@ def cli():
     pass
 
 
-@cli.command("backup")
-def backup():
-    filename = "wifi-connections.json"
+@cli.command("backup", help="Backup all wifi connections from NetworkManager.")
+@click.argument('filename', required=False)
+def backup(filename):
+    if not filename:
+        filename = "wifi-connections.json"
 
     cons = list_connections()
     write_to_file(cons, filename)
 
-    print(f"Wifi connection backuped to: {filename}")
+    print(f"[INFO] Wifi connections backuped to: {filename}")
 
 
-@cli.command("import")
-def _import():
-    filename = "wifi-connections.json"
+@cli.command("import", help="Import wifi connections form a file to the NetworkManager.")
+@click.argument('filename', required=False)
+def _import(filename):
+    if not filename:
+        filename = "wifi-connections.json"
+
+    print(f"[INFO] Wifi connections importing from: {filename}")
+    if not os.path.isfile(filename):
+        print(f"[ERROR] {filename} does not exist")
+        return
 
     with open(filename, "r") as f:
         for json_con in f:
             jcon = json.loads(json_con)
 
             con = create_wifi_connection_dict(jcon)
-            add_connection(connection)
+            add_connection(con)
 
 
 def add_connection(connection):
@@ -56,8 +66,7 @@ def create_wifi_connection_dict(connection):
         'mode': 'infrastructure',
     })
 
-
-    wsecurity = dbus.Dictionary({ 'key-mgmt': 'None' })
+    wsecurity = dbus.Dictionary({'key-mgmt': 'None'})
     if secret_type == "wpa-psk":
         psk = connection['secrets']['psk']
 
@@ -84,7 +93,6 @@ def create_wifi_connection_dict(connection):
         if secrets['anonymous-identity']:
             wsecurity_enterprise['anonymous-identity'] = secrets['anonymous-identity']
 
-
     ip_settings = dbus.Dictionary({'method': 'auto'})
     con = dbus.Dictionary({
         'connection': connection_type,
@@ -102,8 +110,9 @@ def create_wifi_connection_dict(connection):
 
 def merge_secrets(proxy, config, setting_name):
     try:
-        # returns a dict of dicts mapping name::setting, where setting is a dict
-        # mapping key::value.  Each member of the 'setting' dict is a secret
+        # returns a dict of dicts mapping name::setting,
+        # where setting is a dict mapping key::value.
+        # Each member of the 'setting' dict is a secret
         secrets = proxy.GetSecrets(setting_name)
 
         # Copy the secrets into our connection config
