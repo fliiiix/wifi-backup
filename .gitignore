@@ -1,2 +1,6 @@
+build/
+dist/
+wifi_backup.egg-info/
 wifi-connections.json
+src/wifibackup/__pycache__
 env
