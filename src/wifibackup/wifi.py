@@ -24,7 +24,7 @@ def backup(filename):
     print(f"[INFO] Wifi connections backuped to: {filename}")
 
 
-@cli.command("import", help="Import wifi connections form a file to the NetworkManager.")
+@cli.command("import", help="Import wifi connections from a file to the NetworkManager.")
 @click.argument('filename', required=False)
 def _import(filename):
     if not filename:
