@@ -148,7 +148,10 @@ def list_connections():
             if ('802-11-wireless-security' in config):
                 sec_type = config['802-11-wireless-security']['key-mgmt']
                 if (sec_type == "wpa-psk"):
-                    sec = { 'psk': f"{config['802-11-wireless-security']['psk']}" }
+                    if 'psk' in config['802-11-wireless-security']:
+                        sec = { 'psk': f"{config['802-11-wireless-security']['psk']}" }
+                    else:
+                        print(f"[WARN]: Connection {ssid} exported without password")
                 if (sec_type == "wpa-eap"):
                     ano_identity = ""
                     if('anonymous-identity' in config['802-1x']):
