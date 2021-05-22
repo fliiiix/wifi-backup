@@ -71,7 +71,9 @@ def create_wifi_connection_dict(connection):
 
     wsecurity = dbus.Dictionary({"key-mgmt": "None"})
     if secret_type == "wpa-psk":
-        psk = connection["secrets"]["psk"]
+        psk = ""
+        if "psk" in connection["secrets"]:
+            psk = connection["secrets"]["psk"]
 
         wsecurity = dbus.Dictionary(
             {
