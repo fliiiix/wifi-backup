@@ -12,7 +12,7 @@ with codecs.open("README.md", "r", encoding='utf-8') as desc_file:
 if __name__ == '__main__':
     setup(
         name='wifi-backup',
-        version='0.0.2',
+        version='0.0.3',
         description='Backup and Import wifi passwords over dbus.',
         long_description=long_description,
         long_description_content_type="text/markdown",
